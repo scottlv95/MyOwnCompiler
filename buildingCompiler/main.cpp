@@ -75,8 +75,73 @@ static int gettok() {
     LastChar = getchar();
     return ThisChar;
 }
+
+namespace {
+// base class
+class ExprAST {
+    public : virtual ~ExprAST() {}
+};
+   
+// for numbers "1.0"
+class NumberExprAST : public ExprAST {
+    double Val;
+
+public:
+NumberExprAST(double Val) : Val(Val) {}
+};
+
+// for referencing a variable
+class VariableExprAST : public ExprAST {
+    std:: string Name;
+
+public:
+    VariableExprAST(const std:: string &Name) : Name(Name) {};
+};
+
+// for binary operator
+class BinaryExprAST : public ExprAST {
+    char Op;
+    std::unique_ptr<ExprAST> LHS, RHS;
     
-    
-    
+public :
+    BinaryExprAST(char op, std::unique_ptr<ExprAST> LHS, std::unique_ptr<ExprAST> RHS): Op(op), LHS(std::move(LHS)),RHS(std:: move(RHS)) {}
+};
+
+// for function calls
+class CallExprAST : public ExprAST {
+    std::string Callee;
+    std::vector<std::unique_ptr<ExprAST>> Args;
+
+public:
+    CallExprAST(const std::string &Callee,
+                std:: vector<std::unique_ptr<ExprAST>> Args):
+    Callee(Callee), Args(std::move(Args)) {}
+};
+
+// this represents "prototype" of a function
+
+class PrototypeAST {
+    std::string Name;
+    std::vector<std::string> Args;
+public:
+    PrototypeAST(const std:: string &name, std:: vector<std::string> Args): Name(name), Args(std::move(Args)) {}
+    const std:: string &getName() const {return Name; }
+};
+
+// function definition FUTURE TODO: can add type field
+class FunctionAST {
+    std::unique_ptr<PrototypeAST> Proto;
+    std::unique_ptr<ExprAST> Body;
+
+public:
+    FunctionAST(std::unique_ptr<PrototypeAST> Proto,
+                std::unique_ptr<ExprAST> Body): Proto(std::move(Proto)),Body(std::move(Body)) {}
+};
+}
+
+
+
+
+
     
     
